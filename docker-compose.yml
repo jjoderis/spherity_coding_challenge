@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./
+      target: backend-dev
+    container_name: spherity_coding_challenge_backend
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /usr/local/app
+          ignore: package.json
+        - path: ./backend/package.json
+          action: rebuild
+    ports:
+      - 3000:3000
+    networks:
+      - spherity_coding_challenge_network
+  frontend:
+    build:
+      context: ./
+      target: frontend-dev
+    container_name: spherity_coding_challenge_frontend
+    develop:
+      watch:
+        - path: ./frontend
+          action: sync
+          target: /usr/local/app
+          ignore: package.json
+        - path: ./frontend/package.json
+          action: rebuild
+    ports:
+      - 3001:3001
+    networks:
+      - spherity_coding_challenge_network
+
+networks:
+  spherity_coding_challenge_network:
+    driver: bridge

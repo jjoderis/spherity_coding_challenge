@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:backend": "cd backend && npm run start:dev",
-    "dev:frontend": "cd frontend && npm run dev"
+    "docker:dev": "docker compose up --watch"
   },
   "keywords": [],
   "author": "",
