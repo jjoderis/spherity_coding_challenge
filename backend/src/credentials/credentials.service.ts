@@ -1,19 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { Credential } from './interfaces/credentials.interface';
+import { VerifiableCredential } from './interfaces/credentials.interface';
+import { SignaturesService } from '../signatures/signatures.service';
+import { v4 } from 'uuid';
+import { CreateCredentialDto } from './dto/create-credential.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CredentialsService {
-  private credentials: Credential[] = [];
+  private credentials: VerifiableCredential[] = [];
 
-  create(credential: Credential) {
-    this.credentials.push(credential);
+  constructor(
+    private signaturesService: SignaturesService,
+    private configService: ConfigService,
+  ) {}
+
+  /*
+   * Sign and store incoming credential objects
+   */
+  async issue(credential: CreateCredentialDto) {
+    const signedCredential = await this.signaturesService.issue({
+      ...credential,
+      id: `urn:uuid:${v4()}`,
+      issuer: `${this.configService.get<string>('WALLET_URL')}/issuer`,
+    });
+    this.credentials.push(signedCredential);
+    return signedCredential;
   }
 
-  getAll(): Credential[] {
+  getAll() {
     return this.credentials;
   }
 
-  get(id: string): Credential | undefined {
+  get(id: string) {
     return this.credentials.find((c) => c.id === id);
   }
 

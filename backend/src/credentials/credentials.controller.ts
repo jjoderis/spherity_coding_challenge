@@ -24,6 +24,12 @@ export class CredentialsController {
     return this.credentialsService.getAll();
   }
 
+  @Post()
+  @UsePipes(new ZodValidationPipe(createCredentialSchema))
+  async issue(@Body() createCredentialDto: CreateCredentialDto) {
+    return this.credentialsService.issue(createCredentialDto);
+  }
+
   @Get(':id')
   get(@Param('id') id: string) {
     const credential = this.credentialsService.get(id);
@@ -31,12 +37,6 @@ export class CredentialsController {
     if (!credential) throw new NotFoundException();
 
     return credential;
-  }
-
-  @Post()
-  @UsePipes(new ZodValidationPipe(createCredentialSchema))
-  create(@Body() createCredentialDto: CreateCredentialDto) {
-    this.credentialsService.create(createCredentialDto);
   }
 
   @Delete(':id')

@@ -14,6 +14,8 @@ services:
           action: rebuild
     ports:
       - 3000:3000
+    environment:
+      WALLET_URL: "http://localhost:3000"
     networks:
       - spherity_coding_challenge_network
   frontend:

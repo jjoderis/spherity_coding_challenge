@@ -1,4 +1,4 @@
-FROM node:22 AS base
+FROM node:24 AS base
 WORKDIR /usr/local/app
 
 FROM base AS backend-dev

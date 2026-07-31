@@ -1,0 +1,4 @@
+declare module '@digitalbazaar/ecdsa-multikey';
+declare module '@digitalbazaar/ecdsa-sd-2023-cryptosuite';
+declare module '@digitalbazaar/data-integrity';
+declare module '@digitalcredentials/vc';

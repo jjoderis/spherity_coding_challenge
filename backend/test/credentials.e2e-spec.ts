@@ -6,11 +6,8 @@ import { AppModule } from './../src/app.module';
 
 const exampleCredential = {
   '@context': ['https://www.w3.org/ns/credentials/v2'],
-  id: 'testcredentialid',
-  issuer: 'testissuer',
-  type: [],
+  type: ['VerifiableCredential'],
   credentialSubject: {
-    id: 'testsubjectid',
     name: 'Test Subject',
     age: 42,
   },
@@ -51,24 +48,55 @@ describe('CredentialsController (e2e)', () => {
         .get('/credentials')
         .expect(200)
         .then((response) =>
-          expect(response.body).toStrictEqual([exampleCredential]),
+          expect(response.body).toStrictEqual([
+            {
+              ...exampleCredential,
+              id: expect.any(String),
+              issuer: 'http://localhost:3000/issuer',
+              proof: {
+                created: expect.any(String),
+                cryptosuite: expect.any(String),
+                id: expect.any(String),
+                type: 'DataIntegrityProof',
+                verificationMethod: expect.any(String),
+                proofPurpose: expect.any(String),
+                proofValue: expect.any(String),
+              },
+            },
+          ]),
         );
     });
 
     describe('/credentials/:id', () => {
+      let credentialId = 'unknown';
       beforeEach(async () => {
-        await request(app.getHttpServer())
+        const result = await request(app.getHttpServer())
           .post('/credentials')
           .send(exampleCredential)
           .expect(201);
+
+        credentialId = result.body.id;
       });
 
       it('GET', async () => {
         await request(app.getHttpServer())
-          .get(`/credentials/${exampleCredential.id}`)
+          .get(`/credentials/${credentialId}`)
           .expect(200)
           .then((response) =>
-            expect(response.body).toStrictEqual(exampleCredential),
+            expect(response.body).toStrictEqual({
+              ...exampleCredential,
+              id: credentialId,
+              issuer: 'http://localhost:3000/issuer',
+              proof: {
+                created: expect.any(String),
+                cryptosuite: expect.any(String),
+                id: expect.any(String),
+                type: 'DataIntegrityProof',
+                verificationMethod: expect.any(String),
+                proofPurpose: expect.any(String),
+                proofValue: expect.any(String),
+              },
+            }),
           );
 
         return request(app.getHttpServer())
@@ -82,11 +110,26 @@ describe('CredentialsController (e2e)', () => {
           .get('/credentials')
           .expect(200)
           .then((response) =>
-            expect(response.body).toStrictEqual([exampleCredential]),
+            expect(response.body).toStrictEqual([
+              {
+                ...exampleCredential,
+                id: credentialId,
+                issuer: 'http://localhost:3000/issuer',
+                proof: {
+                  created: expect.any(String),
+                  cryptosuite: expect.any(String),
+                  id: expect.any(String),
+                  type: 'DataIntegrityProof',
+                  verificationMethod: expect.any(String),
+                  proofPurpose: expect.any(String),
+                  proofValue: expect.any(String),
+                },
+              },
+            ]),
           );
 
         await request(app.getHttpServer())
-          .delete(`/credentials/${exampleCredential.id}`)
+          .delete(`/credentials/${credentialId}`)
           .expect(200);
 
         // check that the deletion actually removed the credential

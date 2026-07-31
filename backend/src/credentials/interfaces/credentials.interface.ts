@@ -9,3 +9,15 @@ export class Credential {
   validUntil?: string;
   credentialSubject: Record<string, any>;
 }
+
+export class VerifiableCredential extends Credential {
+  proof: {
+    id: string;
+    type: string;
+    created: string;
+    verificationMethod: string;
+    cryptoSuite: string;
+    proofPurpose: string;
+    proofValue: string;
+  };
+}

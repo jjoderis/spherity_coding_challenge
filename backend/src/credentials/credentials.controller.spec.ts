@@ -2,14 +2,16 @@ import { Test } from '@nestjs/testing';
 import { CredentialsController } from './credentials.controller';
 import { CredentialsService } from './credentials.service';
 import { NotFoundException } from '@nestjs/common';
+import { SignaturesModule } from '../signatures/signatures.module';
+import { VerifiableCredential } from './interfaces/credentials.interface';
+import { ConfigModule } from '@nestjs/config';
+import configuration from '../config/configuration';
 
 const exampleCredential = {
   '@context': ['https://www.w3.org/ns/credentials/v2'],
-  id: 'testcredentialid',
-  issuer: 'testissuer',
-  type: [],
+  issuer: 'did:example:testissuer',
+  type: ['VerifiableCredential'],
   credentialSubject: {
-    id: 'testsubjectid',
     name: 'Test Subject',
     age: 42,
   },
@@ -23,6 +25,10 @@ describe('CredentialsController', () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [CredentialsController],
       providers: [CredentialsService],
+      imports: [
+        SignaturesModule,
+        ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+      ],
     }).compile();
 
     credentialsService = moduleRef.get(CredentialsService);
@@ -39,7 +45,9 @@ describe('CredentialsController', () => {
       it('should return all known credentials', () => {
         jest
           .spyOn(credentialsService, 'getAll')
-          .mockImplementation(() => [exampleCredential]);
+          .mockImplementation(() => [
+            exampleCredential as unknown as VerifiableCredential,
+          ]);
 
         expect(credentialsController.getAll()).toStrictEqual([
           exampleCredential,
@@ -48,19 +56,11 @@ describe('CredentialsController', () => {
     });
 
     describe('POST', () => {
-      it('should create a new credential', () => {
-        const spiedOn = jest.spyOn(credentialsService, 'create');
+      it('should create a new verifiable credential', async () => {
+        const spiedOn = jest.spyOn(credentialsService, 'issue');
 
-        const newCredential = {
-          '@context': [],
-          id: 'testid',
-          type: [],
-          issuer: 'testissuer',
-          credentialSubject: {},
-        };
-
-        credentialsController.create(newCredential);
-        expect(spiedOn).toHaveBeenCalledWith(newCredential);
+        await credentialsController.issue(exampleCredential);
+        expect(spiedOn).toHaveBeenCalledWith(exampleCredential);
       });
     });
 
