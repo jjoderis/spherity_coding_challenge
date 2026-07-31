@@ -143,6 +143,96 @@ describe('CredentialsController (e2e)', () => {
           .delete('/credentials/unknowncredentialid')
           .expect(200);
       });
+
+      describe('credentials/:id/share', () => {
+        describe('POST', () => {
+          it('creates a new credential from an existing credential with a derived proof', async () => {
+            const { body: originalCredential } = await request(
+              app.getHttpServer(),
+            ).get(`/credentials/${credentialId}`);
+
+            const { body: derivedCredential } = await request(
+              app.getHttpServer(),
+            )
+              .post(`/credentials/${credentialId}/share`)
+              .expect(201);
+
+            expect(derivedCredential).toStrictEqual({
+              ...originalCredential,
+              proof: {
+                ...originalCredential.proof,
+                proofValue: expect.any(String),
+              },
+            });
+
+            expect(derivedCredential.proof.proofValue).not.toEqual(
+              originalCredential.proof.proofValue,
+            );
+          });
+
+          it('allows selective disclosure of the contents of the original credential', async () => {
+            const { body: derivedCredential } = await request(
+              app.getHttpServer(),
+            )
+              .post(`/credentials/${credentialId}/share`)
+              .send(['/credentialSubject/name'])
+              .expect(201);
+
+            expect(derivedCredential).not.toHaveProperty('issuer');
+            expect(derivedCredential.credentialSubject).not.toHaveProperty(
+              'age',
+            );
+          });
+
+          it('Returns a 404 error when the requested credential does not exist', async () => {
+            return request(app.getHttpServer())
+              .post(`/credentials/unknownid/share`)
+              .expect(404);
+          });
+        });
+      });
+
+      describe('credentials/verification', () => {
+        it('provides a way to verify derived credentials', async () => {
+          const { body: derivedCredential } = await request(app.getHttpServer())
+            .post(`/credentials/${credentialId}/share`)
+            .send(['/credentialSubject/name', '/issuer'])
+            .expect(201);
+
+          return request(app.getHttpServer())
+            .post('/credentials/verification')
+            .send(derivedCredential)
+            .expect(201);
+        });
+
+        it('returns a 400 error when the provided credential has been tampered with', async () => {
+          const { body: derivedCredential } = await request(app.getHttpServer())
+            .post(`/credentials/${credentialId}/share`)
+            .send([
+              '/credentialSubject/name',
+              '/credentialSubject/age',
+              '/issuer',
+            ])
+            .expect(201);
+
+          expect(derivedCredential.credentialSubject.age).toBe(
+            exampleCredential.credentialSubject.age,
+          );
+
+          const manipulatedCredential = {
+            ...derivedCredential,
+            credentialSubject: {
+              ...derivedCredential.credentialSubject,
+              age: exampleCredential.credentialSubject.age + 1,
+            },
+          };
+
+          return request(app.getHttpServer())
+            .post('/credentials/verification')
+            .send(manipulatedCredential)
+            .expect(400);
+        });
+      });
     });
   });
 

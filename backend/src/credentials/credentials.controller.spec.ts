@@ -69,7 +69,9 @@ describe('CredentialsController', () => {
         it('should return the credential with the given id', () => {
           jest
             .spyOn(credentialsService, 'get')
-            .mockImplementation(() => exampleCredential);
+            .mockImplementation(
+              () => exampleCredential as unknown as VerifiableCredential,
+            );
 
           expect(credentialsController.get('testcredentialid')).toBe(
             exampleCredential,
@@ -93,6 +95,50 @@ describe('CredentialsController', () => {
 
           credentialsController.delete('testcredentialid');
           expect(spiedOn).toHaveBeenCalledWith('testcredentialid');
+        });
+      });
+
+      describe('credentials/:id/share', () => {
+        describe('POST', () => {
+          it('should create a derived credential with the selected properties for the credential with the given id', async () => {
+            const spiedOn = jest
+              .spyOn(credentialsService, 'derive')
+              .mockImplementation(
+                () => new Promise((res) => res(exampleCredential)),
+              );
+
+            await credentialsController.share('testcredentialid', [
+              '/credentialSubject/some/property',
+              '/issuer',
+            ]);
+            expect(spiedOn).toHaveBeenCalledWith('testcredentialid', [
+              '/credentialSubject/some/property',
+              '/issuer',
+            ]);
+          });
+
+          it('should throw an http error if the source credential does not exist', async () => {
+            jest
+              .spyOn(credentialsService, 'derive')
+              .mockImplementation(() => new Promise((res) => res(undefined)));
+
+            await expect(() =>
+              credentialsController.share('unknowncredentialid'),
+            ).rejects.toThrow(NotFoundException);
+          });
+        });
+      });
+
+      describe('credentials/verification', () => {
+        describe('POST', () => {
+          it('verifies the given credential', async () => {
+            const spiedOn = jest.spyOn(credentialsService, 'verify');
+
+            await credentialsController.verify(
+              exampleCredential as unknown as VerifiableCredential,
+            );
+            expect(spiedOn).toHaveBeenCalledWith(exampleCredential);
+          });
         });
       });
     });

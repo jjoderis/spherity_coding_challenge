@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,6 +15,7 @@ import {
 } from './dto/create-credential.dto';
 import { CredentialsService } from './credentials.service';
 import { ZodValidationPipe } from './validation.pipe';
+import { VerifiableCredential } from './interfaces/credentials.interface';
 
 @Controller('credentials')
 export class CredentialsController {
@@ -42,5 +44,26 @@ export class CredentialsController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     this.credentialsService.delete(id);
+  }
+
+  @Post(':id/share')
+  async share(@Param('id') id: string, @Body() selectivePointers?: string[]) {
+    const derivedVC = await this.credentialsService.derive(
+      id,
+      selectivePointers,
+    );
+
+    if (!derivedVC) throw new NotFoundException();
+
+    return derivedVC;
+  }
+
+  @Post('verification')
+  async verify(@Body() credential: VerifiableCredential) {
+    const result = await this.credentialsService.verify(credential);
+
+    if (!result.verified) throw new BadRequestException();
+
+    return result;
   }
 }

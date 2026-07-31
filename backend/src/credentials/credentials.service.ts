@@ -38,4 +38,23 @@ export class CredentialsService {
   delete(id: string) {
     this.credentials = this.credentials.filter((c) => c.id !== id);
   }
+
+  /**
+   * Creates a derived credential that can be shared with others which might contain only selected parts of the original credential
+   *
+   * @param id the id of the credential to derive from
+   * @param [selectivePointers] the properties to disclose as paths from the root of the credential (paths need to start with a "/")
+   */
+  async derive(id: string, selectivePointers?: string[]) {
+    const credential = this.get(id);
+    if (!credential) return;
+    return this.signaturesService.derive(credential, selectivePointers);
+  }
+
+  /*
+   * Verifies a given credential by checking its content against the embedded proof
+   */
+  async verify(credential: VerifiableCredential) {
+    return this.signaturesService.verify(credential);
+  }
 }
