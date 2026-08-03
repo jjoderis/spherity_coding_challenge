@@ -17,7 +17,7 @@ import { CredentialsService } from './credentials.service';
 import { ZodValidationPipe } from './validation.pipe';
 import { VerifiableCredential } from './interfaces/credentials.interface';
 
-@Controller('credentials')
+@Controller('/api/credentials')
 export class CredentialsController {
   constructor(private credentialsService: CredentialsService) {}
 

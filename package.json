@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "rm -rf dist && cd backend && npm run build && mv dist ../dist && cp package.json ../dist && cd ../frontend && npm run build && mv dist ../dist/frontend",
+    "docker:build": "docker build . -t",
     "docker:dev": "USER_ID=$(id -u) docker compose up --watch",
     "docker:test-backend": "docker exec spherity_coding_challenge_backend bash -c \"npm run test\"",
     "docker:test-backend-e2e": "docker exec spherity_coding_challenge_backend bash -c \"npm run test:e2e\""

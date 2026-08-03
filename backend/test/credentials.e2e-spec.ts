@@ -25,34 +25,35 @@ describe('CredentialsController (e2e)', () => {
     await app.init();
   });
 
-  describe('/credentials', () => {
+  describe('/api/credentials', () => {
     it('GET', () => {
       return request(app.getHttpServer())
-        .get('/credentials')
+        .get('/api/credentials')
         .expect(200)
         .expect('[]');
     });
 
     it('POST', async () => {
       await request(app.getHttpServer())
-        .post('/credentials')
+        .post('/api/credentials')
         .send({ invalid: 'properties' })
         .expect(400);
 
       await request(app.getHttpServer())
-        .post('/credentials')
+        .post('/api/credentials')
         .send(exampleCredential)
         .expect(201);
 
       await request(app.getHttpServer())
-        .get('/credentials')
+        .get('/api/credentials')
         .expect(200)
         .then((response) =>
           expect(response.body).toStrictEqual([
             {
               ...exampleCredential,
               id: expect.any(String),
-              issuer: 'http://localhost:3000/issuer',
+              issuer: 'http://localhost:3000/api/issuer',
+              issuanceDate: expect.any(String),
               proof: {
                 created: expect.any(String),
                 cryptosuite: expect.any(String),
@@ -67,11 +68,11 @@ describe('CredentialsController (e2e)', () => {
         );
     });
 
-    describe('/credentials/:id', () => {
+    describe('/api/credentials/:id', () => {
       let credentialId = 'unknown';
       beforeEach(async () => {
         const result = await request(app.getHttpServer())
-          .post('/credentials')
+          .post('/api/credentials')
           .send(exampleCredential)
           .expect(201);
 
@@ -80,13 +81,14 @@ describe('CredentialsController (e2e)', () => {
 
       it('GET', async () => {
         await request(app.getHttpServer())
-          .get(`/credentials/${credentialId}`)
+          .get(`/api/credentials/${credentialId}`)
           .expect(200)
           .then((response) =>
             expect(response.body).toStrictEqual({
               ...exampleCredential,
               id: credentialId,
-              issuer: 'http://localhost:3000/issuer',
+              issuer: 'http://localhost:3000/api/issuer',
+              issuanceDate: expect.any(String),
               proof: {
                 created: expect.any(String),
                 cryptosuite: expect.any(String),
@@ -100,21 +102,22 @@ describe('CredentialsController (e2e)', () => {
           );
 
         return request(app.getHttpServer())
-          .get('/credentials/unknowncredentialid')
+          .get('/api/credentials/unknowncredentialid')
           .expect(404);
       });
 
       it('DELETE', async () => {
         // check that there is a credential before the deletion is executed
         await request(app.getHttpServer())
-          .get('/credentials')
+          .get('/api/credentials')
           .expect(200)
           .then((response) =>
             expect(response.body).toStrictEqual([
               {
                 ...exampleCredential,
                 id: credentialId,
-                issuer: 'http://localhost:3000/issuer',
+                issuer: 'http://localhost:3000/api/issuer',
+                issuanceDate: expect.any(String),
                 proof: {
                   created: expect.any(String),
                   cryptosuite: expect.any(String),
@@ -129,33 +132,35 @@ describe('CredentialsController (e2e)', () => {
           );
 
         await request(app.getHttpServer())
-          .delete(`/credentials/${credentialId}`)
+          .delete(`/api/credentials/${credentialId}`)
           .expect(200);
 
         // check that the deletion actually removed the credential
         await request(app.getHttpServer())
-          .get('/credentials')
+          .get('/api/credentials')
           .expect(200)
           .expect('[]');
 
         // when there is nothing to delete we consider the deletion to have "succeded"
         return request(app.getHttpServer())
-          .delete('/credentials/unknowncredentialid')
+          .delete('/api/credentials/unknowncredentialid')
           .expect(200);
       });
 
       describe('credentials/:id/share', () => {
         describe('POST', () => {
           it('creates a new credential from an existing credential with a derived proof', async () => {
-            const { body: originalCredential } = await request(
+            let { body: originalCredential } = await request(
               app.getHttpServer(),
-            ).get(`/credentials/${credentialId}`);
+            ).get(`/api/credentials/${credentialId}`);
 
             const { body: derivedCredential } = await request(
               app.getHttpServer(),
             )
-              .post(`/credentials/${credentialId}/share`)
+              .post(`/api/credentials/${credentialId}/share`)
               .expect(201);
+
+            delete originalCredential.issuanceDate;
 
             expect(derivedCredential).toStrictEqual({
               ...originalCredential,
@@ -174,7 +179,7 @@ describe('CredentialsController (e2e)', () => {
             const { body: derivedCredential } = await request(
               app.getHttpServer(),
             )
-              .post(`/credentials/${credentialId}/share`)
+              .post(`/api/credentials/${credentialId}/share`)
               .send(['/credentialSubject/name'])
               .expect(201);
 
@@ -186,7 +191,7 @@ describe('CredentialsController (e2e)', () => {
 
           it('Returns a 404 error when the requested credential does not exist', async () => {
             return request(app.getHttpServer())
-              .post(`/credentials/unknownid/share`)
+              .post(`/api/credentials/unknownid/share`)
               .expect(404);
           });
         });
@@ -195,19 +200,19 @@ describe('CredentialsController (e2e)', () => {
       describe('credentials/verification', () => {
         it('provides a way to verify derived credentials', async () => {
           const { body: derivedCredential } = await request(app.getHttpServer())
-            .post(`/credentials/${credentialId}/share`)
+            .post(`/api/credentials/${credentialId}/share`)
             .send(['/credentialSubject/name', '/issuer'])
             .expect(201);
 
           return request(app.getHttpServer())
-            .post('/credentials/verification')
+            .post('/api/credentials/verification')
             .send(derivedCredential)
             .expect(201);
         });
 
         it('returns a 400 error when the provided credential has been tampered with', async () => {
           const { body: derivedCredential } = await request(app.getHttpServer())
-            .post(`/credentials/${credentialId}/share`)
+            .post(`/api/credentials/${credentialId}/share`)
             .send([
               '/credentialSubject/name',
               '/credentialSubject/age',
@@ -228,7 +233,7 @@ describe('CredentialsController (e2e)', () => {
           };
 
           return request(app.getHttpServer())
-            .post('/credentials/verification')
+            .post('/api/credentials/verification')
             .send(manipulatedCredential)
             .expect(400);
         });

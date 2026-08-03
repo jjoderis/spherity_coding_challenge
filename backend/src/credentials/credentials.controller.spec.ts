@@ -132,7 +132,11 @@ describe('CredentialsController', () => {
       describe('credentials/verification', () => {
         describe('POST', () => {
           it('verifies the given credential', async () => {
-            const spiedOn = jest.spyOn(credentialsService, 'verify');
+            const spiedOn = jest
+              .spyOn(credentialsService, 'verify')
+              .mockImplementation(
+                () => new Promise((res) => res({ verified: true })),
+              );
 
             await credentialsController.verify(
               exampleCredential as unknown as VerifiableCredential,

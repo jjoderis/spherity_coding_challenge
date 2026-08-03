@@ -8,7 +8,7 @@ export class SignaturesController {
   /*
    * Expose information about the issuer that is required by verifiers that want to verify credentials issued by this wallet
    */
-  @Get('issuer')
+  @Get('/api/issuer')
   async get() {
     return await this.signaturesService.getIssuerInfo();
   }

@@ -1,7 +1,7 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { KeysService } from './keys.service';
 
-@Controller('keys')
+@Controller('/api/keys')
 export class KeysController {
   constructor(private keysService: KeysService) {}
 

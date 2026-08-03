@@ -21,7 +21,7 @@ export class CredentialsService {
     const signedCredential = await this.signaturesService.issue({
       ...credential,
       id: `urn:uuid:${v4()}`,
-      issuer: `${this.configService.get<string>('WALLET_URL')}/issuer`,
+      issuer: `${this.configService.get<string>('WALLET_URL')}/api/issuer`,
       issuanceDate: new Date().toISOString(),
     });
     this.credentials.push(signedCredential);
@@ -49,7 +49,7 @@ export class CredentialsService {
   async derive(id: string, selectivePointers?: string[]) {
     const credential = this.get(id);
     if (!credential) return;
-    return this.signaturesService.derive(credential, selectivePointers);
+    return await this.signaturesService.derive(credential, selectivePointers);
   }
 
   /*

@@ -31,11 +31,11 @@ export class SignaturesService {
    */
   async customDocumentLoader(url: string) {
     const walletURL = this.configService.get<string>('WALLET_URL');
-    if (url.startsWith(`${walletURL}/keys`)) {
-      const keyId = url.replace(`${walletURL}/keys/`, '');
+    if (url.startsWith(`${walletURL}/api/keys`)) {
+      const keyId = url.replace(`${walletURL}/api/keys/`, '');
       const publicKey = await this.keysService.getPublicKey(keyId);
       return { document: publicKey };
-    } else if (url === `${walletURL}/issuer`) {
+    } else if (url === `${walletURL}/api/issuer`) {
       return { document: await this.getIssuerInfo() };
     }
     return defaultDocumentLoader(url);
@@ -53,7 +53,7 @@ export class SignaturesService {
         'https://www.w3.org/ns/did/v1',
         'https://w3id.org/security/multikey/v1',
       ],
-      id: `${this.configService.get<string>('WALLET_URL')}/issuer`,
+      id: `${this.configService.get<string>('WALLET_URL')}/api/issuer`,
       verificationMethod: [publicKey],
       assertionMethod: [publicKey.id],
     };
@@ -65,7 +65,7 @@ export class SignaturesService {
   async issue(credential: Credential) {
     // get a keypair to sign the credential with
     const keyPair = await this.keysService.getOrCreateKeypair('issuer', {
-      controller: `${this.configService.get<string>('WALLET_URL')}/issuer`,
+      controller: `${this.configService.get<string>('WALLET_URL')}/api/issuer`,
     });
 
     const suite = new DataIntegrityProof({

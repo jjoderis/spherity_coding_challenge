@@ -13,6 +13,7 @@ services:
       - 3000:3000
     environment:
       WALLET_URL: "http://localhost:3000"
+      NODE_ENV: "development"
     user: ${USER_ID}
     networks:
       - spherity_coding_challenge_network

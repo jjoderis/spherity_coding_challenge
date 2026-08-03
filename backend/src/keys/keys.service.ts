@@ -21,7 +21,7 @@ export class KeysService {
     // we use the ecdsa-sd-2023 cryptosuite to allow selective disclosure so we need a respective keypair
     const keyPair = await EcdsaMultikey.generate({
       curve: 'P-256',
-      id: `${this.configService.get<string>('WALLET_URL')}/keys/${id}`,
+      id: `${this.configService.get<string>('WALLET_URL')}/api/keys/${id}`,
       ...createOptions,
     });
 
