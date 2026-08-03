@@ -38,7 +38,17 @@ export class SignaturesService {
     } else if (url === `${walletURL}/api/issuer`) {
       return { document: await this.getIssuerInfo() };
     }
-    return defaultDocumentLoader(url);
+    try {
+      return await defaultDocumentLoader(url);
+    } catch (err) {
+      // the document cannot be found locally and is not predefined in the default document loader
+      // ==> we need to fetch it from a remote address
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        return { document: data };
+      }
+    }
   }
 
   /**
