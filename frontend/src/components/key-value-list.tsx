@@ -3,6 +3,7 @@ import { Fragment, useState, type ReactNode } from "react";
 import { Typography, Divider, Grid as AntGrid } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import Grid from "./grid";
+import styles from "./key-value-list.module.scss";
 import gridStyles from "./grid.module.scss";
 import cn from "classnames";
 
@@ -16,6 +17,10 @@ type KeyValueListProps = {
   data: KeyValueListEntryProps[];
 };
 
+/**
+ * Component representing one row in the KeyValueList
+ * Might create nested KeyValueLists if the visualized entry represents an object
+ */
 const KeyValueListEntry: React.FC<KeyValueListEntryProps> = ({
   label,
   value,
@@ -29,15 +34,16 @@ const KeyValueListEntry: React.FC<KeyValueListEntryProps> = ({
       <Typography.Text
         strong
         onClick={() => setIsExpanded(!isExpanded)}
+        // in case of arrays we might have entries that are objects which we want to be able to collapse and expand
         className={cn({ [gridStyles.GridColumnFillRow]: !label && !value })}
         style={{
           textAlign: !label ? "center" : "left",
           marginRight: "15px",
         }}
       >
-        {isExpanded && <MinusOutlined style={{ paddingRight: "5px" }} />}
+        {isExpanded && <MinusOutlined className={styles.ExpansionButton} />}
         {!isExpanded && children?.length && (
-          <PlusOutlined style={{ paddingRight: "5px" }} />
+          <PlusOutlined className={styles.ExpansionButton} />
         )}
 
         {label}
@@ -49,15 +55,7 @@ const KeyValueListEntry: React.FC<KeyValueListEntryProps> = ({
         </Typography.Text>
       )}
       {isExpanded && children && (
-        <div
-          className={gridStyles.GridColumnFillRow}
-          style={{
-            width: "100%",
-            margin: "20px 0",
-            padding: "0 30px",
-            boxSizing: "border-box",
-          }}
-        >
+        <div className={cn(gridStyles.GridColumnFillRow, styles.NestedList)}>
           <KeyValueList data={children} />
         </div>
       )}
@@ -65,6 +63,9 @@ const KeyValueListEntry: React.FC<KeyValueListEntryProps> = ({
   );
 };
 
+/**
+ * A component to visualize generic objects
+ */
 const KeyValueList: React.FC<KeyValueListProps> = ({ data }) => {
   return (
     <Grid colLayout="auto auto">

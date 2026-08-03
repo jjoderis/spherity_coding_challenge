@@ -7,6 +7,9 @@ type CredentialVerificationModalProps = {
   onClose: () => void;
 };
 
+/**
+ * A modal that allows the verification of credentials that can be pasted as JSON into the enclosed text-area
+ */
 const CredentialVerificationModal: React.FC<
   CredentialVerificationModalProps
 > = ({ open, onClose }) => {
@@ -40,6 +43,9 @@ const CredentialVerificationModal: React.FC<
     setVerifying(false);
   };
 
+  /**
+   * inserts newlines and indents into the given JSON string to make it more legible
+   */
   const autoFormat = (toFormat: string) => {
     try {
       const object = JSON.parse(toFormat);

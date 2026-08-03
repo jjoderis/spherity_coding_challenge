@@ -9,6 +9,9 @@ type GridProps = React.PropsWithChildren<{
   style?: CSSProperties;
 }>;
 
+/**
+ * A simple grid container component for use in other components
+ */
 const Grid: React.FC<GridProps> = ({
   colLayout,
   children,

@@ -12,6 +12,9 @@ type CredentialCreationModalProps = {
   onClose: () => void;
 };
 
+/**
+ * A modal that allows the creation of new credentials
+ */
 const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
   open,
   onClose,
@@ -48,11 +51,12 @@ const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
       setSubmitting(true);
       const data = await form.validateFields();
 
+      // transforms (nested) Dayjs dates into date string in the correct format
       function transformDates(input: unknown): unknown {
-        // instanceof does not work on Dayjs for some reason
         if (
           input &&
           typeof input === "object" &&
+          // TODO: instanceof does not work on Dayjs
           "format" in input &&
           typeof input.format === "function" &&
           "year" in input
@@ -72,6 +76,7 @@ const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
       }
 
       const newCredential = transformDates({
+        // extend  with some required metadata
         "@context": ["https://www.w3.org/ns/credentials/v2"],
         type: ["VerifiableCredential", credentialForms[credentialType].type],
         name: data.name,
@@ -84,6 +89,7 @@ const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
       await API.createCredential(newCredential as CreateCredentialDto);
 
       close();
+      // refresh the page to show the new credential in the credentials list
       router.invalidate();
     } catch (err) {
       console.error(err);

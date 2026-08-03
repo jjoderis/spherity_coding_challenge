@@ -10,6 +10,9 @@ type HeaderContentLayoutProps = React.PropsWithChildren<{
   backLink?: React.ComponentProps<typeof Link>["to"];
 }>;
 
+/**
+ * The default layout of our pages with a header row that contains information about the current page and a main area containing the pages content
+ */
 const HeaderContentLayout: React.FC<HeaderContentLayoutProps> = ({
   title,
   backLink,

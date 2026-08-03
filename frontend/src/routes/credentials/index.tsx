@@ -64,6 +64,7 @@ function RouteComponent() {
   ];
 
   if (!xs) {
+    //  only show the name on very small screens
     columns.push(
       {
         title: "Description",
@@ -128,6 +129,7 @@ function RouteComponent() {
     ),
   });
 
+  // get a list of all the credentials that have not expired and that are not waiting to become valid
   const validCredentials = useMemo(() => {
     return credentials.filter((credential: VerifiableCredential) => {
       if (!credential.validFrom && !credential.validUntil) return true;

@@ -53,6 +53,9 @@ function RouteComponent() {
     },
   ];
 
+  /**
+   * Transforms a credential (and nested objects) into the format required by the visualisation component
+   */
   function toKeyValueData(obj: object): KeyValueListEntryProps[] {
     if (Array.isArray(obj)) {
       return obj.map((value) => ({

@@ -150,7 +150,7 @@ describe('CredentialsController (e2e)', () => {
       describe('credentials/:id/share', () => {
         describe('POST', () => {
           it('creates a new credential from an existing credential with a derived proof', async () => {
-            let { body: originalCredential } = await request(
+            const { body: originalCredential } = await request(
               app.getHttpServer(),
             ).get(`/api/credentials/${credentialId}`);
 

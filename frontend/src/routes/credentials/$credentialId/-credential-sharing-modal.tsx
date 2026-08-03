@@ -27,6 +27,7 @@ const ClaimSelection: React.FC<ClaimSelectionProps> = ({
           value = JSON.stringify(value);
         } else if (typeof value === "object") {
           return (
+            // visually nest nested objects
             <Fragment key={key}>
               <Typography.Text
                 className={gridStyles.GridColumnFillRow}
@@ -67,6 +68,10 @@ type CredentialSharingModalProps = {
   credential: VerifiableCredential;
 };
 
+/**
+ * A modal that allows the creation of derived credentials that can be shared with others
+ * Provides a UI to select which claims of a credential should be contained in the derived credential
+ */
 const CredentialSharingModal: React.FC<CredentialSharingModalProps> = ({
   open,
   onClose,
@@ -110,6 +115,7 @@ const CredentialSharingModal: React.FC<CredentialSharingModalProps> = ({
       onOk={submit}
       okButtonProps={{ loading: submitting }}
       title="Select the information to disclose"
+      // force the modal to not overflow the screen
       style={{ height: "90%" }}
       styles={{
         container: { height: "90%", display: "flex", flexDirection: "column" },
@@ -120,6 +126,7 @@ const CredentialSharingModal: React.FC<CredentialSharingModalProps> = ({
         <ClaimSelection
           claims={{
             ...credential,
+            // exclude required/default properties from the properties that can be deselected
             proof: undefined,
             "@context": undefined,
             type: undefined,
