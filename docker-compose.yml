@@ -6,12 +6,10 @@ services:
     container_name: spherity_coding_challenge_backend
     develop:
       watch:
-        - path: ./backend
-          action: sync
-          target: /usr/local/app
-          ignore: package.json
         - path: ./backend/package.json
-          action: rebuild
+          action: restart
+    volumes:
+      - ./backend:/usr/local/app
     ports:
       - 3000:3000
     environment:
@@ -25,12 +23,10 @@ services:
     container_name: spherity_coding_challenge_frontend
     develop:
       watch:
-        - path: ./frontend
-          action: sync
-          target: /usr/local/app
-          ignore: package.json
         - path: ./frontend/package.json
-          action: rebuild
+          action: restart
+    volumes:
+      - ./frontend:/usr/local/app
     ports:
       - 3001:3001
     networks:
