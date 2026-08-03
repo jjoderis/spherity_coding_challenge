@@ -5,6 +5,7 @@ import API from "../../../lib/api";
 import IdCredentialForm from "./id-credential-form";
 import DrivingPermitCredentialForm from "./driving-permit-credential-form";
 import GymMembershipCredentialForm from "./gym-membership-credential-form";
+import type { CreateCredentialDto } from "../../../../../backend/src/credentials/dto/create-credential.dto";
 
 type CredentialCreationModalProps = {
   open: boolean;
@@ -80,7 +81,7 @@ const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
         credentialSubject: data.credentialSubject,
       });
 
-      await API.createCredential(newCredential);
+      await API.createCredential(newCredential as CreateCredentialDto);
 
       close();
       router.invalidate();

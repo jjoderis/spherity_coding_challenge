@@ -90,7 +90,7 @@ export class SignaturesService {
    * @param [selectivePointers=['/credentialSubject', '/issuer']] the properties to disclose as paths from the root of the credential (paths need to start with a "/")
    */
   async derive(
-    credential: Credential,
+    credential: VerifiableCredential,
     selectivePointers: string[] = ['/credentialSubject', '/issuer'],
   ) {
     const suite = new DataIntegrityProof({
@@ -112,7 +112,7 @@ export class SignaturesService {
   /*
    * Verifies a given credential by checking its content against the embedded proof
    */
-  async verify(credential: Credential) {
+  async verify(credential: VerifiableCredential) {
     const suite = new DataIntegrityProof({
       cryptosuite: createVerifyCryptosuite({}),
     });

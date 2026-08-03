@@ -11,7 +11,6 @@ const router = createRouter({
     />
   ),
   defaultErrorComponent: (err) => {
-    console.log(err);
     return (
       <Result
         status={500}

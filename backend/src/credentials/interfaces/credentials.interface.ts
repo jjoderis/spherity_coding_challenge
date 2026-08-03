@@ -1,13 +1,14 @@
 export class Credential {
   '@context': string[];
-  id?: string;
+  id: string = '';
   name?: string;
-  type: string[];
-  issuer: string;
-  issuanceDate?: string;
+  description?: string;
+  type: string[] = ['VerifiableCredential'];
+  issuer: string = '';
+  issuanceDate: string = '';
   validFrom?: string;
   validUntil?: string;
-  credentialSubject: Record<string, any>;
+  credentialSubject: Record<string, any> = {};
 }
 
 export class VerifiableCredential extends Credential {
@@ -19,5 +20,13 @@ export class VerifiableCredential extends Credential {
     cryptoSuite: string;
     proofPurpose: string;
     proofValue: string;
+  } = {
+    id: '',
+    type: '',
+    created: '',
+    verificationMethod: '',
+    cryptoSuite: '',
+    proofPurpose: '',
+    proofValue: '',
   };
 }

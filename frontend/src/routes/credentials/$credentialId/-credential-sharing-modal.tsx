@@ -3,6 +3,7 @@ import Grid from "../../../components/grid";
 import gridStyles from "../../../components/grid.module.scss";
 import { Fragment, useState, type CSSProperties } from "react";
 import API from "../../../lib/api";
+import type { VerifiableCredential } from "../../../../../backend/src/credentials/interfaces/credentials.interface";
 
 type ClaimSelectionProps = {
   path?: string;
@@ -63,7 +64,7 @@ const ClaimSelection: React.FC<ClaimSelectionProps> = ({
 type CredentialSharingModalProps = {
   open: boolean;
   onClose: () => void;
-  credential: any;
+  credential: VerifiableCredential;
 };
 
 const CredentialSharingModal: React.FC<CredentialSharingModalProps> = ({

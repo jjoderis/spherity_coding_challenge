@@ -22,12 +22,12 @@ import CredentialCreationModal from "./-credential-creation-modal";
 import { useMemo, useState } from "react";
 import CredentialVerificationModal from "./-credential-verification-modal";
 import API from "../../lib/api";
+import type { VerifiableCredential } from "../../../../backend/src/credentials/interfaces/credentials.interface";
 
 export const Route = createFileRoute("/credentials/")({
   loader: async () => {
     const time = Date.now();
     const credentials = await API.getCredentials();
-    console.log(credentials);
     return { time, credentials };
   },
   component: RouteComponent,
@@ -129,7 +129,7 @@ function RouteComponent() {
   });
 
   const validCredentials = useMemo(() => {
-    return credentials.filter((credential: any) => {
+    return credentials.filter((credential: VerifiableCredential) => {
       if (!credential.validFrom && !credential.validUntil) return true;
       if (credential.validFrom) {
         const validFrom = new Date(credential.validFrom);
