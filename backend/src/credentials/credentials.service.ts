@@ -22,6 +22,7 @@ export class CredentialsService {
       ...credential,
       id: `urn:uuid:${v4()}`,
       issuer: `${this.configService.get<string>('WALLET_URL')}/issuer`,
+      issuanceDate: new Date().toISOString(),
     });
     this.credentials.push(signedCredential);
     return signedCredential;

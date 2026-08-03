@@ -5,7 +5,6 @@ export const createCredentialSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   type: z.string().array(),
-  issuanceDate: z.string().optional(),
   validFrom: z.string().optional(),
   validUntil: z.string().optional(),
   credentialSubject: z.record(z.string(), z.any()),
