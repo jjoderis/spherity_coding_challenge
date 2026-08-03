@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "docker:dev": "docker compose up --watch",
+    "docker:dev": "USER_ID=$(id -u) docker compose up --watch",
     "docker:test-backend": "docker exec spherity_coding_challenge_backend bash -c \"npm run test\"",
     "docker:test-backend-e2e": "docker exec spherity_coding_challenge_backend bash -c \"npm run test:e2e\""
   },

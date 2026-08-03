@@ -16,7 +16,7 @@ export default defineConfig({
     port: 3001,
     proxy: {
       "/api": {
-        target: "http://backend:3000",
+        target: process.env.BACKEND_URL || "http://localhost:3000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
