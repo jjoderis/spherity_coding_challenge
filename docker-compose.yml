@@ -17,7 +17,7 @@ services:
     user: ${USER_ID}
     networks:
       - spherity_coding_challenge_network
-    command: /bin/bash -c "npm install && npm run start:dev"
+    command: /bin/bash -c "npm ci && npm run start:dev"
   frontend:
     image: node:24
     container_name: spherity_coding_challenge_frontend
@@ -36,7 +36,7 @@ services:
     user: ${USER_ID}
     networks:
       - spherity_coding_challenge_network
-    command: /bin/bash -c "npm install && npm run dev"
+    command: /bin/bash -c "npm ci && npm run dev"
 
 networks:
   spherity_coding_challenge_network:

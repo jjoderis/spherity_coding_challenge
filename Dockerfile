@@ -3,13 +3,13 @@ FROM node:24-alpine AS base
 FROM base AS backend-builder
 WORKDIR /app
 COPY ./backend .
-RUN npm install && npm run build
+RUN npm ci && npm run build
 
 FROM base AS frontend-builder
 WORKDIR /app
 COPY  ./frontend ./frontend
 COPY  --from=backend-builder app ./backend
-RUN cd frontend && npm install && npm run build
+RUN cd frontend && npm ci && npm run build
 
 FROM base AS runner
 
