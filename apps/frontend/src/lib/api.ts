@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
-import { VerifiableCredential } from "../../../backend/src/credentials/interfaces/credentials.interface";
-import type { CreateCredentialDto } from "../../../backend/src/credentials/dto/create-credential.dto";
+import { VerifiableCredential } from "@scc/backend/types/credentials";
+import type { CreateCredentialDto } from "@scc/backend/dto/create-credential";
 
 const baseApiPath = "/api";
 type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;

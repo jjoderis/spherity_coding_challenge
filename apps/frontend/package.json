@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "@scc/frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@scc/backend": "*",
     "@tanstack/react-router": "^1.170.18",
     "@tanstack/react-router-devtools": "^1.167.0",
     "antd": "^6.5.3",
