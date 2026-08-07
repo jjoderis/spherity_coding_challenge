@@ -32,7 +32,9 @@ const HeaderContentLayout: React.FC<HeaderContentLayoutProps> = ({
           </Typography.Title>
         )}
       </Header>
-      <Content className={styles.Main}>{children}</Content>
+      <Content className={styles.Content}>
+        <div className={styles.Main}>{children}</div>
+      </Content>
     </Layout>
   );
 };

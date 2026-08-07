@@ -94,28 +94,24 @@ function RouteComponent() {
   return (
     <>
       <HeaderContentLayout backLink="/credentials" title={credential.name}>
-        <div className={styles.CredentialPage}>
-          <div className={styles.CredentialInfo}>
-            <Space>
-              <Button
-                icon={<ShareAltOutlined />}
-                onClick={() => setShowSharingModal(true)}
-              >
-                Share Credential
-              </Button>
-            </Space>
-            {sections.map((section) => (
-              <Card
-                key={section.title}
-                title={
-                  <div className={styles.InfoSectionTitle}>{section.title}</div>
-                }
-              >
-                {section.content}
-              </Card>
-            ))}
-          </div>
-        </div>
+        <Space>
+          <Button
+            icon={<ShareAltOutlined />}
+            onClick={() => setShowSharingModal(true)}
+          >
+            Share Credential
+          </Button>
+        </Space>
+        {sections.map((section) => (
+          <Card
+            key={section.title}
+            title={
+              <div className={styles.InfoSectionTitle}>{section.title}</div>
+            }
+          >
+            {section.content}
+          </Card>
+        ))}
       </HeaderContentLayout>
       <CredentialSharingModal
         open={showSharingModal}

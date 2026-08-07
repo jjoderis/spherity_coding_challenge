@@ -15,10 +15,18 @@
     }
   }
 
-  .Main {
-    overflow: scroll;
-    max-height: 100%;
+  .Content {
     background-color: #eeeeee;
     padding: 10px 5px;
+    overflow: scroll;
+
+    .Main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      max-width: 1200px;
+      margin: auto;
+    }
   }
 }
