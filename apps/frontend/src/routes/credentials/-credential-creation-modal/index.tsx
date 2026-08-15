@@ -1,11 +1,13 @@
 import { useRouter } from "@tanstack/react-router";
 import { App, DatePicker, Divider, Form, Input, Modal, Select } from "antd";
 import { useState } from "react";
-import API from "../../../lib/api";
 import IdCredentialForm from "./id-credential-form";
 import DrivingPermitCredentialForm from "./driving-permit-credential-form";
 import GymMembershipCredentialForm from "./gym-membership-credential-form";
-import type { CreateCredentialDto } from "../../../../../backend/src/credentials/dto/create-credential.dto";
+import {
+  issueCredential,
+  type CreateCredentialDto,
+} from "@scc/backend/api-client";
 
 type CredentialCreationModalProps = {
   open: boolean;
@@ -86,7 +88,9 @@ const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
         credentialSubject: data.credentialSubject,
       });
 
-      await API.createCredential(newCredential as CreateCredentialDto);
+      await issueCredential({
+        body: newCredential as CreateCredentialDto,
+      });
 
       close();
       // refresh the page to show the new credential in the credentials list

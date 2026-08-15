@@ -9,7 +9,7 @@ export class KeysController {
    * Expose information about public keys that are required by verifiers that want to verify credentials issued by this wallet
    */
   @Get(':id')
-  async get(@Param('id') id: string) {
+  async getKey(@Param('id') id: string) {
     const key = await this.keysService.getPublicKey(id);
 
     if (!key) throw new NotFoundException();

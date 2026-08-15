@@ -5,14 +5,15 @@ import HeaderContentLayout from "../../components/header-content-layout";
 import CredentialCreationModal from "./-credential-creation-modal";
 import { useState } from "react";
 import CredentialVerificationModal from "./-credential-verification-modal";
-import API from "../../lib/api";
 import CredentialsTable from "./-credentials-table";
 import CredentialsStats from "./-credentials-stats";
+import { getAllCredentials } from "@scc/backend/api-client";
 
 export const Route = createFileRoute("/credentials/")({
   loader: async () => {
     const time = Date.now();
-    const credentials = await API.getCredentials();
+    const { data: credentials } = await getAllCredentials();
+
     return { time, credentials };
   },
   component: RouteComponent,

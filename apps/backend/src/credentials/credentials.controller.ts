@@ -7,33 +7,38 @@ import {
   NotFoundException,
   Param,
   Post,
-  UsePipes,
 } from '@nestjs/common';
-import {
-  createCredentialSchema,
-  type CreateCredentialDto,
-} from './dto/create-credential.dto';
+import { CreateCredentialDto } from './dto/create-credential.dto';
 import { CredentialsService } from './credentials.service';
-import { ZodValidationPipe } from './validation.pipe';
 import { VerifiableCredential } from './interfaces/credentials.interface';
 
 @Controller('/api/credentials')
 export class CredentialsController {
   constructor(private credentialsService: CredentialsService) {}
 
+  /**
+   * Get all the credentials stored in the backend
+   */
   @Get()
-  getAll() {
+  getAllCredentials(): VerifiableCredential[] {
     return this.credentialsService.getAll();
   }
 
+  /**
+   * Creates a new verifiable credential by signing the provided credential data and stores the result
+   */
   @Post()
-  @UsePipes(new ZodValidationPipe(createCredentialSchema))
-  async issue(@Body() createCredentialDto: CreateCredentialDto) {
+  async issueCredential(
+    @Body() createCredentialDto: CreateCredentialDto,
+  ): Promise<VerifiableCredential> {
     return this.credentialsService.issue(createCredentialDto);
   }
 
+  /**
+   * Returns the credential with the given id if it is stored in the backend
+   */
   @Get(':id')
-  get(@Param('id') id: string) {
+  getCredential(@Param('id') id: string): VerifiableCredential {
     const credential = this.credentialsService.get(id);
 
     if (!credential) throw new NotFoundException();
@@ -41,13 +46,24 @@ export class CredentialsController {
     return credential;
   }
 
+  /**
+   * Deletes the credential with the given id from the backend
+   */
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  deleteCredential(@Param('id') id: string) {
     this.credentialsService.delete(id);
   }
 
+  /**
+   * Creates a derived credential from the credential with the given id (if it exists) that can the be shared with others
+   *
+   * @param selectivePointers a list of path to properties that should be included in the derived credentials (e.g. "/credentialSubject/name")
+   */
   @Post(':id/share')
-  async share(@Param('id') id: string, @Body() selectivePointers?: string[]) {
+  async shareCredential(
+    @Param('id') id: string,
+    @Body() selectivePointers?: string[],
+  ): Promise<VerifiableCredential> {
     const derivedVC = await this.credentialsService.derive(
       id,
       selectivePointers,
@@ -58,8 +74,11 @@ export class CredentialsController {
     return derivedVC;
   }
 
+  /**
+   * Verifies that the given credential string is a valid non-manipulated credential
+   */
   @Post('verification')
-  async verify(@Body() credential: VerifiableCredential) {
+  async verifyCredential(@Body() credential: VerifiableCredential) {
     const result = await this.credentialsService.verify(credential);
 
     if (!result.verified) throw new BadRequestException();

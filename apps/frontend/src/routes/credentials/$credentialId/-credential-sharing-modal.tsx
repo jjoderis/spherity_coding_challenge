@@ -2,8 +2,10 @@ import { App, Checkbox, Form, Modal, Typography } from "antd";
 import Grid from "../../../components/grid";
 import gridStyles from "../../../components/grid.module.scss";
 import { Fragment, useState, type CSSProperties } from "react";
-import API from "../../../lib/api";
-import type { VerifiableCredential } from "../../../../../backend/src/credentials/interfaces/credentials.interface";
+import {
+  shareCredential,
+  type VerifiableCredential,
+} from "@scc/backend/api-client";
 
 type ClaimSelectionProps = {
   path?: string;
@@ -92,10 +94,10 @@ const CredentialSharingModal: React.FC<CredentialSharingModalProps> = ({
         .filter(([_, value]) => !!value)
         .map(([key]) => key);
 
-      const result = await API.shareCredential(credential.id, [
-        ...toDisclose,
-        "/issuer",
-      ]);
+      const { data: result } = await shareCredential({
+        path: { id: credential.id },
+        body: [...toDisclose, "/issuer"],
+      });
       navigator.clipboard.writeText(JSON.stringify(result));
       onClose();
       message.info("Copied the shareable credential to your clipboard.");

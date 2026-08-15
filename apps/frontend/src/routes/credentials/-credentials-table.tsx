@@ -1,10 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { App, Empty, Grid, Modal, Table, type TableColumnType } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-
-import { VerifiableCredential } from "@scc/backend/types/credentials";
-
-import API from "../../lib/api";
+import {
+  deleteCredential as apiDeleteCredential,
+  type VerifiableCredential,
+} from "@scc/backend/api-client";
 
 type CredentialsTableProps = {
   credentials: VerifiableCredential[];
@@ -73,7 +73,7 @@ const CredentialsTable: React.FC<CredentialsTableProps> = ({ credentials }) => {
         ),
         onOk: async () => {
           try {
-            await API.deleteCredential(id);
+            await apiDeleteCredential({ path: { id } });
             router.invalidate();
           } catch (err) {
             console.error(err);

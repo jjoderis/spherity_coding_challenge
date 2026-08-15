@@ -11,8 +11,9 @@
     "docker:dev": "USER_ID=$(id -u) docker compose up --watch",
     "build": "turbo build",
     "docker:build": "docker build . -t",
-    "docker:test-backend": "docker exec spherity_coding_challenge_backend bash -c \"npm run test\"",
-    "docker:test-backend-e2e": "docker exec spherity_coding_challenge_backend bash -c \"npm run test:e2e\""
+    "docker:test-backend": "docker exec spherity_coding_challenge bash -c \"npm run test\"",
+    "docker:test-backend-e2e": "docker exec spherity_coding_challenge bash -c \"npm run test:e2e\"",
+    "generate:client": "docker exec spherity_coding_challenge bash -c \"node apps/backend/generate-client-api.mjs\""
   },
   "keywords": [],
   "author": "",

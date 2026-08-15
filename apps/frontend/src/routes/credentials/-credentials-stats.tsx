@@ -1,4 +1,4 @@
-import type { VerifiableCredential } from "@scc/backend/types/credentials";
+import type { VerifiableCredential } from "@scc/backend/api-client";
 import { Card, Flex, Statistic } from "antd";
 import { useMemo } from "react";
 

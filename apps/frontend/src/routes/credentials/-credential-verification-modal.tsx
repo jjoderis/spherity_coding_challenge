@@ -1,6 +1,6 @@
 import { Alert, App, Button, Flex, Input, Modal } from "antd";
 import { useState } from "react";
-import API from "../../lib/api";
+import { verifyCredential as apiVerifyCredential } from "@scc/backend/api-client";
 
 type CredentialVerificationModalProps = {
   open: boolean;
@@ -28,7 +28,10 @@ const CredentialVerificationModal: React.FC<
   const verifyCredential = async () => {
     setVerifying(true);
     try {
-      await API.verifyCredential(credential);
+      const result = await apiVerifyCredential({
+        body: JSON.parse(credential),
+      });
+      if (result.error) throw result.error;
       setResult({
         message: "The given data is a valid credential.",
         type: "success",

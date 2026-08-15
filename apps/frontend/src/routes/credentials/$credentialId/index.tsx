@@ -7,18 +7,25 @@ import KeyValueList, {
 import styles from "./index.module.scss";
 import HeaderContentLayout from "../../../components/header-content-layout";
 import { useState } from "react";
-import API from "../../../lib/api";
 import CredentialSharingModal from "./-credential-sharing-modal";
+import {
+  getCredential,
+  type VerifiableCredential,
+} from "@scc/backend/api-client";
 
 export const Route = createFileRoute("/credentials/$credentialId/")({
   loader: async ({ params: { credentialId } }) => {
-    return API.getCredential(credentialId);
+    const { data: credential } = await getCredential({
+      path: { id: credentialId },
+    });
+
+    return credential;
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const credential = Route.useLoaderData();
+  const credential = Route.useLoaderData() as VerifiableCredential;
 
   const credentialInformation = [
     { label: "ID", value: credential.id },
