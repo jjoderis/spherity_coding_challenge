@@ -1,15 +1,9 @@
 FROM node:24-alpine AS base
 
-FROM base AS backend-builder
+FROM base AS builder
 WORKDIR /app
-COPY ./backend .
+COPY . .
 RUN npm ci && npm run build
-
-FROM base AS frontend-builder
-WORKDIR /app
-COPY  ./frontend ./frontend
-COPY  --from=backend-builder app ./backend
-RUN cd frontend && npm ci && npm run build
 
 FROM base AS runner
 
@@ -22,9 +16,8 @@ RUN adduser --system --uid 1001 nodejs
 
 WORKDIR /app
 
-COPY --from=backend-builder --chown=nodejs:nodejs app/dist ./
-COPY --from=backend-builder --chown=nodejs:nodejs app/node_modules ./node_modules
-COPY --from=frontend-builder --chown=nodejs:nodejs app/frontend/dist ./frontend
+COPY --from=builder --chown=nodejs:nodejs app/dist ./
+RUN npm install --omit=dev
 
 USER nodejs
 

@@ -1,0 +1,32 @@
+.Layout {
+  height: 100%;
+
+  .Header {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+
+    .Title {
+      width: 100%;
+      align-self: center;
+      text-align: center;
+      margin: 0;
+    }
+  }
+
+  .Content {
+    background-color: #eeeeee;
+    padding: 10px 5px;
+    overflow: scroll;
+
+    .Main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      max-width: 1200px;
+      margin: auto;
+    }
+  }
+}

@@ -1,0 +1,161 @@
+import { useRouter } from "@tanstack/react-router";
+import { App, DatePicker, Divider, Form, Input, Modal, Select } from "antd";
+import { useState } from "react";
+import IdCredentialForm from "./id-credential-form";
+import DrivingPermitCredentialForm from "./driving-permit-credential-form";
+import GymMembershipCredentialForm from "./gym-membership-credential-form";
+import {
+  issueCredential,
+  type CreateCredentialDto,
+} from "@scc/backend/api-client";
+
+type CredentialCreationModalProps = {
+  open: boolean;
+  onClose: () => void;
+};
+
+/**
+ * A modal that allows the creation of new credentials
+ */
+const CredentialCreationModal: React.FC<CredentialCreationModalProps> = ({
+  open,
+  onClose,
+}) => {
+  const [form] = Form.useForm();
+  const { message } = App.useApp();
+  const router = useRouter();
+
+  const credentialForms = {
+    "ID Card": { form: <IdCredentialForm />, type: "ExampleIDCredential" },
+    "Driving Permit": {
+      form: <DrivingPermitCredentialForm />,
+      type: "ExampleDrivingPermitCredential",
+    },
+    "Gym Membership": {
+      form: <GymMembershipCredentialForm />,
+      type: "ExampleGymMembershipCredential",
+    },
+  } as const;
+
+  const [credentialType, setCredentialType] =
+    useState<keyof typeof credentialForms>("ID Card");
+
+  const [submitting, setSubmitting] = useState(false);
+
+  const close = () => {
+    form.resetFields();
+    setCredentialType("ID Card");
+    onClose();
+  };
+
+  const submit = async () => {
+    try {
+      setSubmitting(true);
+      const data = await form.validateFields();
+
+      // transforms (nested) Dayjs dates into date string in the correct format
+      function transformDates(input: unknown): unknown {
+        if (
+          input &&
+          typeof input === "object" &&
+          // TODO: instanceof does not work on Dayjs
+          "format" in input &&
+          typeof input.format === "function" &&
+          "year" in input
+        ) {
+          return input.format("YYYY-MM-DDTHH:mm:ssZ");
+        } else if (!input || typeof input !== "object") {
+          return input;
+        }
+
+        if (Array.isArray(input)) return input.map(transformDates);
+
+        return Object.fromEntries(
+          Object.entries(input).map(([key, value]) => {
+            return [key, transformDates(value)];
+          }),
+        );
+      }
+
+      const newCredential = transformDates({
+        // extend  with some required metadata
+        "@context": ["https://www.w3.org/ns/credentials/v2"],
+        type: ["VerifiableCredential", credentialForms[credentialType].type],
+        name: data.name,
+        description: data.description,
+        validFrom: data.validity?.[0],
+        validUntil: data.validity?.[1],
+        credentialSubject: data.credentialSubject,
+      });
+
+      await issueCredential({
+        body: newCredential as CreateCredentialDto,
+      });
+
+      close();
+      // refresh the page to show the new credential in the credentials list
+      router.invalidate();
+    } catch (err) {
+      console.error(err);
+      message.error(
+        "Encountered an error while trying to create the credential.",
+      );
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <Modal
+      open={open}
+      title="Issue a new credential"
+      onCancel={close}
+      onOk={submit}
+      okButtonProps={{ loading: submitting }}
+    >
+      <Form form={form} layout="vertical">
+        <Form.Item
+          label="Credential Name"
+          name="name"
+          required
+          rules={[{ required: true, message: "Please enter a name" }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Credential Description"
+          name="description"
+          required
+          rules={[{ required: true, message: "Please enter a description" }]}
+        >
+          <Input.TextArea />
+        </Form.Item>
+
+        <Form.Item label="Validity Period" name="validity">
+          <DatePicker.RangePicker
+            showTime={{ format: "HH:mm" }}
+            allowEmpty
+            style={{ width: "100%" }}
+          />
+        </Form.Item>
+
+        <Divider orientation="horizontal" titlePlacement="end">
+          <Select
+            value={credentialType}
+            options={Object.keys(credentialForms).map((key) => ({
+              key,
+              label: key,
+              value: key,
+            }))}
+            onChange={(val) => setCredentialType(val)}
+            popupMatchSelectWidth={false}
+          />
+        </Divider>
+
+        {credentialForms[credentialType].form}
+      </Form>
+    </Modal>
+  );
+};
+
+export default CredentialCreationModal;
